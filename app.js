@@ -1,31 +1,42 @@
-var express = require("express");
-var app = express();
-var bodyParser = require("body-parser");
+var express = require("express"),
+    app = express(),
+    bodyParser = require("body-parser"),
+    mongoose = require("mongoose");
 
+mongoose.connect("mongodb://localhost:27017/yelp_camp", {useNewUrlParser: true});
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
-var campgrounds = [
-    { name: "Salmon Creek", image: "https://photosforclass.com/download/pixabay-1149402?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e1d14a4e52ae14f6da8c7dda793f7f1636dfe2564c704c732c7cdc9648c15a_960.jpg&user=Free-Photos" },
-    { name: "Granite Hill", image: "https://photosforclass.com/download/pixabay-1851092?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e8d0424a5bae14f6da8c7dda793f7f1636dfe2564c704c732c7cdc9648c15a_960.jpg&user=Pexels" },
-    { name: "Mountain Goat's Rest", image: "https://photosforclass.com/download/pixabay-1208201?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e2d54b4852ad14f6da8c7dda793f7f1636dfe2564c704c732c7cdd9244c05f_960.jpg&user=Free-Photos" },
-    { name: "Salmon Creek", image: "https://photosforclass.com/download/pixabay-1149402?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e1d14a4e52ae14f6da8c7dda793f7f1636dfe2564c704c732c7cdc9648c15a_960.jpg&user=Free-Photos" },
-    { name: "Granite Hill", image: "https://photosforclass.com/download/pixabay-1851092?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e8d0424a5bae14f6da8c7dda793f7f1636dfe2564c704c732c7cdc9648c15a_960.jpg&user=Pexels" },
-    { name: "Mountain Goat's Rest", image: "https://photosforclass.com/download/pixabay-1208201?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e2d54b4852ad14f6da8c7dda793f7f1636dfe2564c704c732c7cdd9244c05f_960.jpg&user=Free-Photos" },
-    { name: "Salmon Creek", image: "https://photosforclass.com/download/pixabay-1149402?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e1d14a4e52ae14f6da8c7dda793f7f1636dfe2564c704c732c7cdc9648c15a_960.jpg&user=Free-Photos" },
-    { name: "Granite Hill", image: "https://photosforclass.com/download/pixabay-1851092?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e8d0424a5bae14f6da8c7dda793f7f1636dfe2564c704c732c7cdc9648c15a_960.jpg&user=Pexels" },
-    { name: "Mountain Goat's Rest", image: "https://photosforclass.com/download/pixabay-1208201?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e2d54b4852ad14f6da8c7dda793f7f1636dfe2564c704c732c7cdd9244c05f_960.jpg&user=Free-Photos" },
-    { name: "Salmon Creek", image: "https://photosforclass.com/download/pixabay-1149402?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e1d14a4e52ae14f6da8c7dda793f7f1636dfe2564c704c732c7cdc9648c15a_960.jpg&user=Free-Photos" },
-    { name: "Granite Hill", image: "https://photosforclass.com/download/pixabay-1851092?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e8d0424a5bae14f6da8c7dda793f7f1636dfe2564c704c732c7cdc9648c15a_960.jpg&user=Pexels" },
-    { name: "Mountain Goat's Rest", image: "https://photosforclass.com/download/pixabay-1208201?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e2d54b4852ad14f6da8c7dda793f7f1636dfe2564c704c732c7cdd9244c05f_960.jpg&user=Free-Photos" },
-];
+//SCHEMA SETUP
+var campgroundSchema = new mongoose.Schema({
+    name: String,
+    image: String
+});
+
+var Campground = mongoose.model("Campground", campgroundSchema);
+// Campground.create(
+//     {
+//         name: "Mountain Goat's Rest", 
+//         image: "https://photosforclass.com/download/pixabay-1208201?webUrl=https%3A%2F%2Fpixabay.com%2Fget%2F57e2d54b4852ad14f6da8c7dda793f7f1636dfe2564c704c732c7cdd9244c05f_960.jpg&user=Free-Photos"
+//     }, function (err, campground) {
+//     if (err)
+//         console.log(err);
+//     else
+//         console.log(campground);
+// });
 
 app.get("/", function (req, res) {
     res.render("landing");
 });
 
 app.get("/campgrounds", function (req, res) {
-    res.render("campgrounds", { campgrounds: campgrounds });
+    Campground.find({}, function (erro, allcampgrounds) {
+        if (erro)
+            console.log(erro);
+        else
+            res.render("campgrounds", { campgrounds: allcampgrounds });
+    });
+    //res.render("campgrounds", { campgrounds: campgrounds });
 });
 
 app.get("/campgrounds/new", function (req, res) {
@@ -37,8 +48,14 @@ app.post("/campgrounds", function (req, res) {
     var image = req.body.image;
 
     var newCampGround = { name: name, image: image };
-    campgrounds.push(newCampGround);
-    res.redirect("/campgrounds");
+    Campground.create(newCampGround, function(erro, newCamp) {
+        if (erro)
+            console.log(erro);
+        else {
+            console.log(newCamp);
+            res.redirect("/campgrounds");
+        }
+    });
 });
 
 app.listen(3000, function() {
