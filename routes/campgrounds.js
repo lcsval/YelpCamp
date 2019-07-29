@@ -3,12 +3,13 @@ var router = express.Router();
 var Campground = require("../models/campground");
 var middleware = require("../middleware");
 
-router.get("/", function (req, res) {
-    Campground.find({}, function (err, allCampgrounds) {
-        if (err)
-            console.log(err);
-        else
-            res.render("campgrounds/index", { campgrounds: allCampgrounds });
+router.get("/", function(req, res){
+    Campground.find({}, function(err, allCampgrounds){
+       if(err){
+           console.log(err);
+       } else {
+          res.render("campgrounds/index",{campgrounds: allCampgrounds, page: 'campgrounds'});
+       }
     });
 });
 
@@ -35,6 +36,7 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 });
 
 router.get("/:id", function(req, res) {
+    debugger;
     Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground) {
         if (err || !foundCampground) {
             req.flash("error",  "Campground not found");
