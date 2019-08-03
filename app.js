@@ -13,14 +13,12 @@ var express = require("express"),
 
 var commentRoutes = require("./routes/comments"), 
     campgroundRoutes = require("./routes/campgrounds")
-    indexRoutes = require("./routes/index")
-    
+    indexRoutes = require("./routes/index");
+
+console.log(process.env.DATABASEURL);
 //mongoose.connect("mongodb://localhost:27017/yelp_camp", {useNewUrlParser: true});
 //"mongodb+srv://lucasval:1128667@cluster0-uyju3.mongodb.net/test?retryWrites=true&w=majority"
-mongoose.connect(process.env.DATABASEURL, {
-    useNewUrlParser: true,
-    useCreateIndex: true
-}).then(() => {
+mongoose.connect(process.env.DATABASEURL, { useNewUrlParser: true }).then(() => {
     console.log("Connected to DB!");
 }).catch(err => {
     console.log("ERROR: ", err.message);
@@ -61,3 +59,7 @@ app.use("/campgrounds/:id/comments", commentRoutes);
 app.listen(process.env.PORT, process.env.IP, function() {
     console.log("YelpCamp Has Started!");
 });
+
+//app.listen(3000, function() {
+//    console.log("Serving on http://localhost:3000/");
+//});
