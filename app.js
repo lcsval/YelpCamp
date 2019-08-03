@@ -18,7 +18,7 @@ var commentRoutes = require("./routes/comments"),
 console.log(process.env.DATABASEURL);
 //mongoose.connect("mongodb://localhost:27017/yelp_camp", {useNewUrlParser: true});
 //"mongodb+srv://lucasval:1128667@cluster0-uyju3.mongodb.net/test?retryWrites=true&w=majority"
-mongoose.connect(process.env.DATABASEURL, { useNewUrlParser: true }).then(() => {
+mongoose.connect("mongodb+srv://lucasval:1128667@cluster0-uyju3.mongodb.net/test?retryWrites=true&w=majority", { useNewUrlParser: true }).then(() => {
     console.log("Connected to DB!");
 }).catch(err => {
     console.log("ERROR: ", err.message);
